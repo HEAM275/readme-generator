@@ -1,7 +1,10 @@
-from fastapi import FastAPI, APIRouter
-from fastapi.responses import PlainTextResponse
+from fastapi import FastAPI, APIRouter, Request
+from fastapi.responses import PlainTextResponse,HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from typing import List, Optional
+import json
 
 
 app = FastAPI()
@@ -11,6 +14,8 @@ app = FastAPI(
     description="API para generar archivos README.md en Markdown a partir de datos estructurados.",
     version="1.0.0"
 )
+
+templates = Jinja2Templates(directory="templates")
 
 class ReadmeData(BaseModel):
     title: str
@@ -171,3 +176,25 @@ def download_readme(data: ReadmeData):
             "Content-Type": "text/markdown; charset=utf-8"
         }
     )
+
+# 🖥️ Página principal (formulario)
+@app.get("/", response_class=HTMLResponse)
+def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+# 📤 Endpoint para descargar (JSON → archivo)
+@app.post("/api/download", response_class=PlainTextResponse)
+def download_readme(data: ReadmeData):
+    markdown = generate_markdown(data)
+    return PlainTextResponse(
+        content=markdown,
+        headers={
+            "Content-Disposition": 'attachment; filename="README.md"',
+            "Content-Type": "text/markdown; charset=utf-8"
+        }
+    )
+
+# (Opcional) Endpoint para previsualizar
+@app.post("/api/preview")
+def preview_readme(data: ReadmeData):
+    return {"markdown": generate_markdown(data)}

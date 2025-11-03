@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Generador de README.md</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 900px;
+      margin: 20px auto;
+      padding: 20px;
+      line-height: 1.6;
+      color: #333;
+    }
+    h1, h2 {
+      color: #2c3e50;
+    }
+    label {
+      display: block;
+      margin-top: 16px;
+      font-weight: bold;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 6px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    textarea {
+      height: 100px;
+      font-family: monospace;
+    }
+    .section {
+      background: #f9f9f9;
+      padding: 16px;
+      border-radius: 6px;
+      margin-top: 20px;
+      border: 1px solid #eee;
+    }
+    .array-item {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .array-item input {
+      flex: 1;
+      min-width: 200px;
+    }
+    .array-controls {
+      margin-top: 10px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 12px 24px;
+      font-size: 16px;
+      background: #2ecc71;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      width: 100%;
+    }
+    button:hover {
+      background: #27ae60;
+    }
+    .checkbox-group {
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .endpoint-fields {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .endpoint-fields input {
+      flex: 1;
+      min-width: 120px;
+    }
+  </style>
+</head>
+<body>
+  <h1>📝 Generador de README.md para APIs</h1>
+  <p>Completa los campos y descarga un README profesional listo para GitHub.</p>
+
+  <label for="title">Título del proyecto *</label>
+  <input type="text" id="title" placeholder="Ej: Mi API de Gestión de Tareas" required />
+
+  <label for="description">Descripción (opcional)</label>
+  <textarea id="description" placeholder="Una breve descripción de tu proyecto..."></textarea>
+
+  <!-- Features -->
+  <div class="section">
+    <label>✨ Características (una por línea)</label>
+    <div id="features-container">
+      <div class="array-item">
+        <input type="text" class="feature-input" placeholder="Ej: Autenticación JWT" />
+      </div>
+    </div>
+    <div class="array-controls">
+      <button type="button" onclick="addInput('feature')">+ Añadir característica</button>
+    </div>
+  </div>
+
+  <!-- Installation -->
+  <div class="section">
+    <label>🚀 Comandos de instalación (uno por línea)</label>
+    <div id="installation-container">
+      <div class="array-item">
+        <input type="text" class="install-input" placeholder="git clone https://github.com/..." />
+      </div>
+    </div>
+    <div class="array-controls">
+      <button type="button" onclick="addInput('install')">+ Añadir comando</button>
+    </div>
+  </div>
+
+  <label for="usage_example">📖 Ejemplo de uso (código Python)</label>
+  <textarea id="usage_example" placeholder="from mi_api import Client&#10;client = Client(api_key='...')&#10;print(client.get_data())"></textarea>
+
+  <!-- Endpoints -->
+  <div class="section">
+    <label>🔌 Endpoints (API REST)</label>
+    <div id="endpoints-container">
+      <div class="array-item">
+        <div class="endpoint-fields">
+          <input type="text" class="endpoint-method" placeholder="GET" style="width: 80px;"/>
+          <input type="text" class="endpoint-path" placeholder="/api/v1/items"/>
+          <input type="text" class="endpoint-desc" placeholder="Obtiene todos los elementos"/>
+        </div>
+      </div>
+    </div>
+    <div class="array-controls">
+      <button type="button" onclick="addEndpoint()">+ Añadir endpoint</button>
+    </div>
+  </div>
+
+  <label for="configuration">⚙️ Variables de entorno (.env)</label>
+  <textarea id="configuration" placeholder="API_KEY=secreto&#10;DEBUG=false"></textarea>
+
+  <label for="tests">🧪 Comandos de pruebas</label>
+  <textarea id="tests" placeholder="pytest&#10;# o&#10;python -m unittest"></textarea>
+
+  <label for="deployment">📦 Comandos de despliegue</label>
+  <textarea id="deployment" placeholder="docker build -t mi-api .&#10;docker run -p 8000:8000 mi-api"></textarea>
+
+  <label for="contributing">🤝 Cómo contribuir</label>
+  <textarea id="contributing" placeholder="¡Las contribuciones son bienvenidas! Por favor lee CONTRIBUTING.md"></textarea>
+
+  <label for="license">📄 Licencia</label>
+  <input type="text" id="license" value="MIT" placeholder="MIT, Apache 2.0, GPL, etc." />
+
+  <label for="acknowledgements">🙏 Agradecimientos</label>
+  <textarea id="acknowledgements" placeholder="Inspirado en FastAPI y GitHub Docs"></textarea>
+
+  <label for="support">📬 Soporte</label>
+  <textarea id="support" placeholder="¿Problemas? Abre un issue en GitHub o contáctanos por email."></textarea>
+
+  <div class="checkbox-group">
+    <input type="checkbox" id="include_badges" checked />
+    <label for="include_badges">Incluir badge de licencia</label>
+  </div>
+
+  <button type="button" onclick="submitForm()">📥 Descargar README.md</button>
+
+  <script>
+    function addInput(type) {
+      const containerId = type === 'feature' ? 'features-container' : 'installation-container';
+      const className = type === 'feature' ? 'feature-input' : 'install-input';
+      const container = document.getElementById(containerId);
+      const div = document.createElement("div");
+      div.className = "array-item";
+      div.innerHTML = `<input type="text" class="${className}" placeholder="Nuevo elemento" />`;
+      container.appendChild(div);
+    }
+
+    function addEndpoint() {
+      const container = document.getElementById("endpoints-container");
+      const div = document.createElement("div");
+      div.className = "array-item";
+      div.innerHTML = `
+        <div class="endpoint-fields">
+          <input type="text" class="endpoint-method" placeholder="POST" style="width: 80px;"/>
+          <input type="text" class="endpoint-path" placeholder="/api/v1/items"/>
+          <input type="text" class="endpoint-desc" placeholder="Crea un nuevo elemento"/>
+        </div>
+      `;
+      container.appendChild(div);
+    }
+
+    function getArrayValues(className) {
+      return Array.from(document.querySelectorAll(`.${className}`))
+        .map(el => el.value.trim())
+        .filter(v => v !== "");
+    }
+
+    function submitForm() {
+      const title = document.getElementById("title").value.trim();
+      if (!title) {
+        alert("Por favor ingresa un título.");
+        return;
+      }
+
+      // Recoger endpoints como lista de objetos
+      const endpoints = [];
+      document.querySelectorAll("#endpoints-container .array-item").forEach(item => {
+        const method = item.querySelector(".endpoint-method")?.value.trim();
+        const path = item.querySelector(".endpoint-path")?.value.trim();
+        const desc = item.querySelector(".endpoint-desc")?.value.trim();
+        if (method || path || desc) {
+          endpoints.push({ method, path, description: desc });
+        }
+      });
+
+      const data = {
+        title: title,
+        description: document.getElementById("description")?.value.trim() || undefined,
+        features: getArrayValues("feature-input"),
+        installation: getArrayItems("install-input"),
+        usage_example: document.getElementById("usage_example")?.value.trim() || undefined,
+        endpoints: endpoints.length > 0 ? endpoints : undefined,
+        configuration: document.getElementById("configuration")?.value.trim() || undefined,
+        tests: document.getElementById("tests")?.value.trim() || undefined,
+        deployment: document.getElementById("deployment")?.value.trim() || undefined,
+        contributing: document.getElementById("contributing")?.value.trim() || undefined,
+        license: document.getElementById("license")?.value.trim() || undefined,
+        acknowledgements: document.getElementById("acknowledgements")?.value.trim() || undefined,
+        support: document.getElementById("support")?.value.trim() || undefined,
+        include_badges: document.getElementById("include_badges").checked
+      };
+
+      // Helper para campos de lista
+      function getArrayItems(className) {
+        return Array.from(document.querySelectorAll(`.${className}`))
+          .map(el => el.value.trim())
+          .filter(v => v !== "");
+      }
+
+      // Limpiar campos undefined o vacíos
+      Object.keys(data).forEach(key => {
+        const val = data[key];
+        if (val === undefined || 
+            (Array.isArray(val) && val.length === 0) ||
+            (typeof val === 'string' && val === '')) {
+          delete data[key];
+        }
+      });
+
+      // Enviar
+      fetch("/api/download", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(response => {
+        if (!response.ok) {
+          return response.text().then(t => { throw new Error(t || "Error en el servidor"); });
+        }
+        return response.blob();
+      })
+      .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "README.md";
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        a.remove();
+      })
+      .catch(err => {
+        alert("Error:\n" + err.message);
+        console.error(err);
+      });
+    }
+  </script>
+</body>
+</html>
