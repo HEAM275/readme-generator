@@ -28,3 +28,6 @@ pip install -r requirements.txt ó uv pip install -r pyproject.toml
 ## 📄 Licencia
 
 Este proyecto está bajo la licencia **MIT**.
+
+
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/HEAM275/readme-generator)
